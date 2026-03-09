@@ -1,13 +1,14 @@
 # Rainbow changelog
 
-## Unreleased 
+## Unreleased
 
-- Development: Drop `rbx` section in Gemfile. No continued support effort for Rubinius. 
+- Development: Drop `rbx` section in Gemfile. No continued support effort for Rubinius.
 - Development: Support Ruby 3.3 and 3.4 in CI.
+- Use RGB values instead of trying to map them.
 
 ## 3.1.1 (2022-01-11)
 
-- fix: Ensure `files` directive in gemspec adds all files 
+- fix: Ensure `files` directive in gemspec adds all files
 
 ## 3.1.0 (2022-01-11)
 

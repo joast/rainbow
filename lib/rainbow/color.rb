@@ -1,16 +1,20 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/AbcSize
+# rubocop:disable Metrics/CyclomaticComplexity
+# rubocop:disable Metrics/MethodLength
+
 module Rainbow
-  class Color
+  class Color # :nodoc:
     attr_reader :ground
 
     def self.build(ground, values)
       unless [1, 3].include?(values.size)
         raise ArgumentError,
-              "Wrong number of arguments for color definition, should be 1 or 3"
+              'Wrong number of arguments for color definition, should be 1 or 3'
       end
 
-      color = values.size == 1 ? values.first : values
+      color = (values.size == 1) ? values.first : values
 
       case color
       # NOTE: Properly handle versions before/after Ruby 2.4.0.
@@ -27,7 +31,7 @@ module Rainbow
           X11Named.new(ground, color)
         else
           raise ArgumentError,
-                "Unknown color name, valid names: " +
+                'Unknown color name, valid names: ' +
                 (Named.color_names + X11Named.color_names).join(', ')
         end
       when Array
@@ -38,9 +42,9 @@ module Rainbow
     end
 
     def self.parse_hex_color(hex)
-      unless hex =~ /^#?[a-f0-9]{6}/i
+      unless hex.match?(/^#?[a-f0-9]{6}/i)
         raise ArgumentError,
-              "Invalid hexadecimal RGB triplet. Valid format: /^#?[a-f0-9]{6}/i"
+              'Invalid hexadecimal RGB triplet. Valid format: /^#?[a-f0-9]{6}/i'
       end
 
       hex = hex.sub(/^#/, '')
@@ -51,7 +55,7 @@ module Rainbow
       [r, g, b]
     end
 
-    class Indexed < Color
+    class Indexed < Color # :nodoc:
       attr_reader :num
 
       def initialize(ground, num)
@@ -60,13 +64,13 @@ module Rainbow
       end
 
       def codes
-        code = num + (ground == :foreground ? 30 : 40)
+        code = num + ((ground == :foreground) ? 30 : 40)
 
         [code]
       end
     end
 
-    class Named < Indexed
+    class Named < Indexed # :nodoc:
       NAMES = {
         black: 0,
         red: 1,
@@ -97,16 +101,12 @@ module Rainbow
       end
     end
 
-    class RGB < Indexed
+    class RGB < Indexed # :nodoc:
       attr_reader :r, :g, :b
-
-      def self.to_ansi_domain(value)
-        (6 * (value / 256.0)).to_i
-      end
 
       def initialize(ground, *values)
         if values.min.negative? || values.max > 255
-          raise ArgumentError, "RGB value outside 0-255 range"
+          raise ArgumentError, 'RGB value outside 0-255 range'
         end
 
         super(ground, 8)
@@ -114,19 +114,11 @@ module Rainbow
       end
 
       def codes
-        super + [5, code_from_rgb]
-      end
-
-      private
-
-      def code_from_rgb
-        16 + self.class.to_ansi_domain(r) * 36 +
-          self.class.to_ansi_domain(g) * 6 +
-          self.class.to_ansi_domain(b)
+        super + [2, r, g, b]
       end
     end
 
-    class X11Named < RGB
+    class X11Named < RGB # :nodoc:
       include X11ColorNames
 
       def self.color_names
@@ -148,3 +140,7 @@ module Rainbow
     end
   end
 end
+
+# rubocop:enable Metrics/MethodLength
+# rubocop:enable Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/AbcSize
